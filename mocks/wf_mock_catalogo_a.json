@@ -1,0 +1,86 @@
+{
+  "name": "wf_mock_catalogo_a",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "v1/mock/catalogo-a/menu",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        -160
+      ],
+      "id": "2dacf1ef-0c8a-46cb-8e18-30477e53ac89",
+      "name": "gt_mock_catalogo_a",
+      "webhookId": "9062c588-e5ba-433c-971e-86e27f3f7faa"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"pizzas\": [\n    { \"id_pizza\": \"p1\", \"nome\": \"Calabresa\", \"preco\": 45.0 },\n    { \"id_pizza\": \"p2\", \"nome\": \"Margherita\", \"preco\": 42.0 },\n    { \"id_pizza\": \"p3\", \"nome\": \"Portuguesa\", \"preco\": 48.0 }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        240,
+        -160
+      ],
+      "id": "f2ea3743-2851-4735-886a-8dea2d323a68",
+      "name": "set_menu"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        464,
+        -160
+      ],
+      "id": "2744b473-8c92-4a6b-8f8e-98f9a660e5a3",
+      "name": "resp_menu"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "gt_mock_catalogo_a": {
+      "main": [
+        [
+          {
+            "node": "set_menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_menu": {
+      "main": [
+        [
+          {
+            "node": "resp_menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4fa58c9b-b677-4af1-835b-d2d72c67260d",
+  "meta": {
+    "instanceId": "a21cbc75f6286c26719b8fa059919ae1aefdbd6d0081fe90469a6502551e0563"
+  },
+  "nodeGroups": [],
+  "id": "WmcRP5TF7eFGG2Us",
+  "tags": []
+}

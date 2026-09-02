@@ -1,0 +1,4 @@
+Planilha: https://docs.google.com/spreadsheets/d/1quOZbIRMG4hUilYBrKLnLXK73USqQW7FxHNWBEfh2IU/edit?usp=sharing
+
+n8n cloud: http://179.199.140.176/signin?redirect=%252Fhome%252Fworkflows
+acesso: Link na planilha ao lado do seu nome
