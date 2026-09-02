@@ -1,0 +1,110 @@
+{
+  "name": "wf_gateway_health",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "v1/health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1baefd40-a820-428f-82ce-f65943f0e245",
+      "name": "gt_health",
+      "webhookId": "9062c588-e5ba-433c-971e-86e27f3f7faa"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02d867d0-e26d-4799-9a53-247f0414f627",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "a5702875-ce63-448f-bc2d-e3c19872d833",
+              "name": "servico",
+              "value": "gateway",
+              "type": "string"
+            },
+            {
+              "id": "a54115d7-ec1c-4e76-bf5b-7d78e71b6e84",
+              "name": "versao",
+              "value": "v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "c7f254f2-bca4-40f6-a0fd-dead2ab4752f",
+      "name": "set_health"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "73f2e547-1df7-4b25-9b2d-08cc25aede4d",
+      "name": "resp_health"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "gt_health": {
+      "main": [
+        [
+          {
+            "node": "set_health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_health": {
+      "main": [
+        [
+          {
+            "node": "resp_health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "a095c231-1474-4593-9fbd-1083765c8a79",
+  "meta": {
+    "instanceId": "a21cbc75f6286c26719b8fa059919ae1aefdbd6d0081fe90469a6502551e0563"
+  },
+  "nodeGroups": [],
+  "id": "diO7pcdMPoIrBFeQ",
+  "tags": []
+}
