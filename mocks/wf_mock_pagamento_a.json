@@ -1,0 +1,161 @@
+{
+  "name": "wf_mock_pagamento_a",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/mock/pagamento-a/cobranca",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5b8138d6-3dea-465c-95d7-bd88e3abe7e2",
+      "name": "gt_mock_pagamento_a",
+      "webhookId": "c51e1ef1-f389-4ac1-8eef-8e4c5da0f3ac"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"servico_indisponivel\" }",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        432,
+        -80
+      ],
+      "id": "4b76f83f-6b01-4905-8276-cc722e8ca8a9",
+      "name": "resp_erro"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5b5e8451-b6aa-400b-b3d6-cbc465f48820",
+              "leftValue": "={{ $json.body.simular_erro }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b3e8644a-2aa0-49c7-9c41-e8655cf46f5f",
+      "name": "if_simular_erro"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        112
+      ],
+      "id": "7b2cd5d7-44c8-4d12-ba5f-279905d7ed6f",
+      "name": "resp_pagamento"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"id_pagamento\": \"pag_{{ $now.toMillis() }}\",\n  \"pedido_id\": \"{{ $json.body.pedido_id }}\",\n\"valor\": \"{{ $json.body.valor }}\",  \"status\": \"{{ $json.body.valor <= 500 ? 'aprovado' : 'recusado' }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        112
+      ],
+      "id": "0c61ad9c-78cd-46e5-ad75-7567488fa42d",
+      "name": "set_pagamento"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "gt_mock_pagamento_a": {
+      "main": [
+        [
+          {
+            "node": "if_simular_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_simular_erro": {
+      "main": [
+        [
+          {
+            "node": "resp_erro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set_pagamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "resp_pagamento": {
+      "main": [
+        []
+      ]
+    },
+    "set_pagamento": {
+      "main": [
+        [
+          {
+            "node": "resp_pagamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a22f21d1-d09f-4b3e-8df4-bfa392ce1d5b",
+  "meta": {
+    "instanceId": "a21cbc75f6286c26719b8fa059919ae1aefdbd6d0081fe90469a6502551e0563"
+  },
+  "nodeGroups": [],
+  "id": "QUoBXtVBHEPHK3mZ",
+  "tags": []
+}
