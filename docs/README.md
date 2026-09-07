@@ -1,7 +1,7 @@
 # PZaaS — API Gateway (serviço 01)
 
 Projeto da disciplina Arquitetura de Serviços em Nuvem — UNISANTA.
-Dupla: Guilherme e (nome da dupla).
+Dupla: Guilherme Lins e Guilherme Correia.
 
 O Gateway é o ponto único de entrada da pizzaria. Ele recebe as chamadas do
 cliente, gera o `x-pedido-id`, chama os outros serviços e devolve a resposta.
