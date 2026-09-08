@@ -4,32 +4,32 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "v1/pedido",
+        "path": "v1/s01/pedido",
         "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1472,
-        64
+        -480,
+        -16
       ],
-      "id": "5b0a39de-db9f-4a7f-be9a-e339055ee890",
+      "id": "d5cece07-7a0d-40d1-aaba-e7681f0d8583",
       "name": "gt_pedido",
       "webhookId": "82cc06bc-3e4a-4bb0-a91e-594d2e5d464f",
       "alwaysOutputData": true
     },
     {
       "parameters": {
-        "jsCode": "const pedido = $('gt_pedido').first().json.body;\n\nconst catalogo = $('http_catalogo').first().json;\nconst pizzas = catalogo.pizzas || [];\nconst precos = {};\nfor (const p of pizzas) {\n  precos[p.nome] = p.preco;\n}\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    throw new Error(`Pizza sem preço no catálogo: ${item.pizza}`);\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    url_pagamento: \"http://localhost:5678/webhook/v1/mock/pagamento-a/cobranca\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
+        "jsCode": "const pedido = $('gt_pedido').first().json.body;\n\n// monta a tabela de precos a partir da resposta do Catalogo\nconst catalogo = $('http_catalogo').first().json;\nconst pizzas = catalogo.pizzas || [];\nconst precos = {};\nfor (const p of pizzas) {\n  precos[p.nome] = p.preco;\n}\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    // pizza fora do catalogo -> pedido invalido, sem derrubar o fluxo\n    return [{\n      json: {\n        _erro: true,\n        erro: \"pizza_sem_preco\",\n        motivo: `Pizza sem preço no catálogo: ${item.pizza}`\n      }\n    }];\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    _erro: false,\n    url_pagamento: \"https://dannneves.app.n8n.cloud/webhook/v1/pagamento\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -832,
-        64
+        304,
+        -16
       ],
-      "id": "463ccbe7-7f1d-4df7-8913-eb1119554a14",
+      "id": "4221bfbb-342f-4522-ad8d-b6011f6fdfc4",
       "name": "calc_valor"
     },
     {
@@ -81,10 +81,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        -384,
-        -48
+        800,
+        -144
       ],
-      "id": "7e6ee9c7-1151-4ca8-bd69-86bad81ca2d9",
+      "id": "adb8e056-25f3-4f0e-b9ab-50231d3026a5",
       "name": "http_pagamento"
     },
     {
@@ -98,10 +98,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -192,
-        -48
+        992,
+        -144
       ],
-      "id": "b84c8d7a-d557-488c-932b-3b6b7c02c5a4",
+      "id": "7a7ed2a3-fa29-47b0-92b6-e14a8f64de80",
       "name": "resp_pedido"
     },
     {
@@ -139,10 +139,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -640,
-        64
+        512,
+        -16
       ],
-      "id": "f1ef1ec1-98bb-451b-be61-bf57f92067d6",
+      "id": "8bc12304-b8ce-48df-9b0e-898a0103c33c",
       "name": "sw_valida"
     },
     {
@@ -162,10 +162,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        -992,
-        64
+        16,
+        -16
       ],
-      "id": "f869fc1a-5dc3-4657-a7dc-b9e9fb32cb62",
+      "id": "8c2f0813-3ae0-4d8f-b928-350bb3842792",
       "name": "http_catalogo"
     },
     {
@@ -179,7 +179,7 @@
           },
           "conditions": [
             {
-              "id": "d7d58639-3a1c-4b20-8903-1fb6b18aa6c5",
+              "id": "63e3124f-f946-40e3-9b42-deabc037f64d",
               "leftValue": "={{ $json.headers['x-api-key'] }}",
               "rightValue": "turma2026",
               "operator": {
@@ -196,10 +196,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -1248,
-        64
+        -272,
+        -16
       ],
-      "id": "a02366af-134e-4bc6-83d6-eafcb4903350",
+      "id": "8cf3c03e-efcb-4d79-b7df-d089298b7fcf",
       "name": "if_key"
     },
     {
@@ -213,10 +213,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -192,
-        128
+        800,
+        32
       ],
-      "id": "dbc7aa26-bc28-4294-8128-fd597cd69784",
+      "id": "11833583-8d74-409a-9654-9407552fed07",
       "name": "resp_pedido_invalido"
     },
     {
@@ -230,10 +230,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -992,
-        240
+        16,
+        176
       ],
-      "id": "70203422-423d-4ce9-bb6d-8f5d0ad4f573",
+      "id": "00f09569-d3e1-4e8b-a111-8cb72b71735a",
       "name": "resp_erro_auth"
     }
   ],
@@ -320,16 +320,16 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "e4dc2b2e-c0ea-45a8-bb28-c2a2920fd2c5",
+  "versionId": "203c3a4f-61e3-4689-baba-14c63f15d729",
   "meta": {
-    "instanceId": "8a5832cfccebf1f6e4152d67714b8a9e39672100660b3961e0850a37e9a65b24"
+    "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
   },
   "nodeGroups": [],
-  "id": "jpOfXEMC5AWaDBdx",
+  "id": "rmqMTcOE1u3QVwtA",
   "tags": []
 }
