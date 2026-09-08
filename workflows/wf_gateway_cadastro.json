@@ -1,0 +1,260 @@
+{
+  "name": "wf_gateway_cadastro",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "73649f39-49be-4145-b391-458e846a2e80",
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        144
+      ],
+      "id": "6d6a5b67-f019-4f19-a32e-24d9cb11feab",
+      "name": "if_api_key_valida"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"API key ausente ou invalida\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        304,
+        272
+      ],
+      "id": "760a97b2-ebec-41ee-8724-d36212092a78",
+      "name": "resp_api_key_invalida"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/gateway/cadastro",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        144
+      ],
+      "id": "386e8ce1-b010-456a-974d-7785ade348df",
+      "name": "post_cadastro",
+      "webhookId": "72502c99-55db-44ca-9cb3-d0c43e6a2a6d"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pzaas.online/webhook/cadastro_b/cadastro",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n\"x-api-key\": \"turma2026\",\n\"x-pedido-id\": \"={{ $json.headers['x-pedido-id'] }}\",\n\"Content-Type\": \"application/json\"\n} ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"nome\":\t\"{{ $json.body.nome }}\",\n\"email\": \"{{ $json.body.email }}\",\n\"senha\": \"{{ $json.body.senha }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        528,
+        0
+      ],
+      "id": "10c61476-7b9e-4d1e-8768-4752633daae9",
+      "name": "req_cadastro",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        752,
+        -96
+      ],
+      "id": "03835a95-fd41-4dea-bdcc-749e73c4f3f4",
+      "name": "resp_cadastro_ok"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"cadastro_indisponivel\" }",
+        "options": {
+          "responseCode": 503
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        752,
+        80
+      ],
+      "id": "fc935607-7621-4606-b292-5fea01753c52",
+      "name": "resp_cadastro_indisponivel"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0e6f68a6-2d6e-4c55-ae3c-6a9a45963bab",
+              "leftValue": "={{ $json.headers['x-pedido-id'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        80
+      ],
+      "id": "6a85e1dc-298f-4045-8eaa-9a911fa67161",
+      "name": "if_x_pedido_id_presente"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"pedido_id_invalido\",\n  \"mensagem\": \"Informe pedido_id como inteiro positivo\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        528,
+        160
+      ],
+      "id": "2000eb7c-edc1-4505-afbb-12dc0a25d04c",
+      "name": "resp_x_pedido_id_ausente"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "if_api_key_valida": {
+      "main": [
+        [
+          {
+            "node": "if_x_pedido_id_presente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_api_key_invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post_cadastro": {
+      "main": [
+        [
+          {
+            "node": "if_api_key_valida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "req_cadastro": {
+      "main": [
+        [
+          {
+            "node": "resp_cadastro_ok",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_cadastro_indisponivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_x_pedido_id_presente": {
+      "main": [
+        [
+          {
+            "node": "req_cadastro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_x_pedido_id_ausente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "309d60d4-bd1b-4659-96a2-6fe486e16b93",
+  "meta": {
+    "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
+  },
+  "nodeGroups": [],
+  "id": "jQuuszCz4pxBpAKi",
+  "tags": []
+}
