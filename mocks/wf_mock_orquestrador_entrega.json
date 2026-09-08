@@ -15,21 +15,16 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:5678/webhook/v1/s01/entrega",
+        "url": "http://localhost:5678/webhook/v1/entrega",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "x-api-key",
               "value": "turma2026"
-            }
-          ]
-        },
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
+            },
             {
-              "name": "pedido_id",
+              "name": "x-pedido-id",
               "value": "42"
             }
           ]

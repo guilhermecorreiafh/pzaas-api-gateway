@@ -29,10 +29,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        64,
-        144
+        -688,
+        240
       ],
-      "id": "6d6a5b67-f019-4f19-a32e-24d9cb11feab",
+      "id": "3cd96ca3-7285-413b-9a9d-8549aee13d44",
       "name": "if_api_key_valida"
     },
     {
@@ -46,10 +46,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        304,
-        272
+        -448,
+        368
       ],
-      "id": "760a97b2-ebec-41ee-8724-d36212092a78",
+      "id": "6ce9933c-167b-4fb1-a1ef-0c5c6189acaf",
       "name": "resp_api_key_invalida"
     },
     {
@@ -62,10 +62,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -144,
-        144
+        -896,
+        240
       ],
-      "id": "386e8ce1-b010-456a-974d-7785ade348df",
+      "id": "2e9a94b0-6766-4ea6-b919-f0a25c85160f",
       "name": "post_cadastro",
       "webhookId": "72502c99-55db-44ca-9cb3-d0c43e6a2a6d"
     },
@@ -75,7 +75,7 @@
         "url": "https://pzaas.online/webhook/cadastro_b/cadastro",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "{\n\"x-api-key\": \"turma2026\",\n\"x-pedido-id\": \"={{ $json.headers['x-pedido-id'] }}\",\n\"Content-Type\": \"application/json\"\n} ",
+        "jsonHeaders": "{\n\"x-api-key\": \"turma2026\",\n\"Content-Type\": \"application/json\"\n} ",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n\"nome\":\t\"{{ $json.body.nome }}\",\n\"email\": \"{{ $json.body.email }}\",\n\"senha\": \"{{ $json.body.senha }}\"\n}",
@@ -84,10 +84,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        528,
-        0
+        -448,
+        160
       ],
-      "id": "10c61476-7b9e-4d1e-8768-4752633daae9",
+      "id": "068c99d9-bd86-4650-9122-de93c2057450",
       "name": "req_cadastro",
       "onError": "continueErrorOutput"
     },
@@ -102,10 +102,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        752,
-        -96
+        -224,
+        64
       ],
-      "id": "03835a95-fd41-4dea-bdcc-749e73c4f3f4",
+      "id": "1eb3ed33-b5ef-41c3-bfa6-a663e18a551d",
       "name": "resp_cadastro_ok"
     },
     {
@@ -119,62 +119,11 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        752,
-        80
+        -224,
+        240
       ],
-      "id": "fc935607-7621-4606-b292-5fea01753c52",
+      "id": "887dadcd-9698-461d-a4e0-b6e208e16a5b",
       "name": "resp_cadastro_indisponivel"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "0e6f68a6-2d6e-4c55-ae3c-6a9a45963bab",
-              "leftValue": "={{ $json.headers['x-pedido-id'] }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        304,
-        80
-      ],
-      "id": "6a85e1dc-298f-4045-8eaa-9a911fa67161",
-      "name": "if_x_pedido_id_presente"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\n  \"erro\": \"pedido_id_invalido\",\n  \"mensagem\": \"Informe pedido_id como inteiro positivo\"\n}",
-        "options": {
-          "responseCode": 400
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        528,
-        160
-      ],
-      "id": "2000eb7c-edc1-4505-afbb-12dc0a25d04c",
-      "name": "resp_x_pedido_id_ausente"
     }
   ],
   "pinData": {},
@@ -183,7 +132,7 @@
       "main": [
         [
           {
-            "node": "if_x_pedido_id_presente",
+            "node": "req_cadastro",
             "type": "main",
             "index": 0
           }
@@ -225,24 +174,6 @@
           }
         ]
       ]
-    },
-    "if_x_pedido_id_presente": {
-      "main": [
-        [
-          {
-            "node": "req_cadastro",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "resp_x_pedido_id_ausente",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "active": false,
@@ -250,11 +181,11 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "309d60d4-bd1b-4659-96a2-6fe486e16b93",
+  "versionId": "6d65a3a2-8647-409e-adbd-9a269b9288ea",
   "meta": {
     "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
   },
   "nodeGroups": [],
-  "id": "jQuuszCz4pxBpAKi",
+  "id": "0PXMbE33JNVhEAiK",
   "tags": []
 }
