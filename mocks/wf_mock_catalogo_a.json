@@ -3,34 +3,69 @@
   "nodes": [
     {
       "parameters": {
-        "path": "v1/mock/catalogo-a/menu",
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e9e3d0e1-3612-4340-9a66-32ccdf4ca6b2",
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        16,
+        128
+      ],
+      "id": "9f96246b-9643-4c44-9abd-e6c175e691c3",
+      "name": "if_api_key_valida"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"API key ausente ou invalida\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        240,
+        240
+      ],
+      "id": "32eb9976-8ba6-436f-9887-911953b6b433",
+      "name": "resp_api_key_invalida"
+    },
+    {
+      "parameters": {
+        "path": "v1/menu",
         "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        16,
-        -160
+        -208,
+        128
       ],
-      "id": "2dacf1ef-0c8a-46cb-8e18-30477e53ac89",
+      "id": "ea29f6ed-f8d2-4359-b6c0-821863a0a37c",
       "name": "gt_mock_catalogo_a",
       "webhookId": "9062c588-e5ba-433c-971e-86e27f3f7faa"
-    },
-    {
-      "parameters": {
-        "mode": "raw",
-        "jsonOutput": "{\n  \"pizzas\": [\n    { \"id_pizza\": \"p1\", \"nome\": \"Calabresa\", \"preco\": 45.0 },\n    { \"id_pizza\": \"p2\", \"nome\": \"Margherita\", \"preco\": 42.0 },\n    { \"id_pizza\": \"p3\", \"nome\": \"Portuguesa\", \"preco\": 48.0 }\n  ]\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.5,
-      "position": [
-        240,
-        -160
-      ],
-      "id": "f2ea3743-2851-4735-886a-8dea2d323a68",
-      "name": "set_menu"
     },
     {
       "parameters": {
@@ -39,20 +74,53 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        464,
-        -160
+        448,
+        80
       ],
-      "id": "2744b473-8c92-4a6b-8f8e-98f9a660e5a3",
+      "id": "b28a340e-3802-4811-abb0-5220ca799fd6",
       "name": "resp_menu"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"pizzas\": [\n    {\n      \"id\": 1,\n      \"nome\": \"Calabresa\",\n      \"ingredientes\": [\"molho de tomate\", \"mussarela\", \"calabresa\", \"cebola\"],\n      \"preco\": 45.9,\n      \"disponivel\": true\n    },\n    {\n      \"id\": 2,\n      \"nome\": \"Marguerita\",\n      \"ingredientes\": [\"molho de tomate\", \"mussarela\", \"tomate\", \"manjericao\"],\n      \"preco\": 42.9,\n      \"disponivel\": true\n    },\n    {\n      \"id\": 3,\n      \"nome\": \"Portuguesa\",\n      \"ingredientes\": [\"molho de tomate\", \"mussarela\", \"presunto\", \"ovo\", \"cebola\"],\n      \"preco\": 48.9,\n      \"disponivel\": true\n    }\n  ],\n  \"promocoes\": [\n    {\n      \"id\": 1,\n      \"descricao\": \"2 pizzas grandes por R$ 79,90\",\n      \"ativa\": true\n    },\n    {\n      \"id\": 2,\n      \"descricao\": \"Pizza grande + refrigerante por R$ 54,90\",\n      \"ativa\": true\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        240,
+        80
+      ],
+      "id": "d9eca23d-0555-458c-b8ae-95b762d76899",
+      "name": "set_menu"
     }
   ],
   "pinData": {},
   "connections": {
-    "gt_mock_catalogo_a": {
+    "if_api_key_valida": {
       "main": [
         [
           {
             "node": "set_menu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_api_key_invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gt_mock_catalogo_a": {
+      "main": [
+        [
+          {
+            "node": "if_api_key_valida",
             "type": "main",
             "index": 0
           }
@@ -71,16 +139,16 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "4fa58c9b-b677-4af1-835b-d2d72c67260d",
+  "versionId": "2ec77cc3-994a-4227-8507-df05be6d7a29",
   "meta": {
-    "instanceId": "a21cbc75f6286c26719b8fa059919ae1aefdbd6d0081fe90469a6502551e0563"
+    "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
   },
   "nodeGroups": [],
-  "id": "WmcRP5TF7eFGG2Us",
+  "id": "wjTEsvbGWKFr24Hi",
   "tags": []
 }
