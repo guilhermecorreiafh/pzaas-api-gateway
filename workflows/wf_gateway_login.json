@@ -54,57 +54,6 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "0e6f68a6-2d6e-4c55-ae3c-6a9a45963bab",
-              "leftValue": "={{ $json.headers['x-pedido-id'] }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        304,
-        80
-      ],
-      "id": "6a85e1dc-298f-4045-8eaa-9a911fa67161",
-      "name": "if_x_pedido_id_presente"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\n  \"erro\": \"x_pedido_id_ausente\",\n  \"mensagem\": \"Informe o header x-pedido-id\"\n}",
-        "options": {
-          "responseCode": 400
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        528,
-        160
-      ],
-      "id": "2000eb7c-edc1-4505-afbb-12dc0a25d04c",
-      "name": "resp_x_pedido_id_ausente"
-    },
-    {
-      "parameters": {
         "httpMethod": "POST",
         "path": "v1/gateway/login",
         "responseMode": "responseNode",
@@ -126,7 +75,7 @@
         "url": "https://pzaas.online/webhook/cadastro_b/login",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "{\n\"x-api-key\": \"turma2026\",\n\"x-pedido-id\": \"={{ $json.headers['x-pedido-id'] }}\",\n\"Content-Type\": \"application/json\"\n} ",
+        "jsonHeaders": "{\n\"x-api-key\": \"turma2026\",\n\"Content-Type\": \"application/json\"\n} ",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n\"email\": \"{{ $json.body.email }}\",\n\"senha\": \"{{ $json.body.senha }}\"\n}",
@@ -135,8 +84,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        528,
-        0
+        304,
+        48
       ],
       "id": "10c61476-7b9e-4d1e-8768-4752633daae9",
       "name": "req_login",
@@ -153,8 +102,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        784,
-        -128
+        560,
+        -80
       ],
       "id": "03835a95-fd41-4dea-bdcc-749e73c4f3f4",
       "name": "resp_login_ok"
@@ -170,8 +119,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        944,
-        176
+        720,
+        224
       ],
       "id": "fc935607-7621-4606-b292-5fea01753c52",
       "name": "resp_login_indisponivel"
@@ -187,8 +136,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        944,
-        -32
+        720,
+        16
       ],
       "id": "585bc74e-0005-4ad8-b002-5eea3bfba2e7",
       "name": "resp_credenciais_invalidas"
@@ -220,8 +169,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        720,
-        64
+        496,
+        112
       ],
       "id": "59e9f6bb-7d5c-45fd-85be-fc08481d171d",
       "name": "if_credenciais_invalidas"
@@ -233,24 +182,6 @@
       "main": [
         [
           {
-            "node": "if_x_pedido_id_presente",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "resp_api_key_invalida",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "if_x_pedido_id_presente": {
-      "main": [
-        [
-          {
             "node": "req_login",
             "type": "main",
             "index": 0
@@ -258,7 +189,7 @@
         ],
         [
           {
-            "node": "resp_x_pedido_id_ausente",
+            "node": "resp_api_key_invalida",
             "type": "main",
             "index": 0
           }

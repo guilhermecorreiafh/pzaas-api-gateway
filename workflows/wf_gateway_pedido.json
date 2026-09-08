@@ -8,8 +8,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -608,
-        320
+        -784,
+        480
       ],
       "id": "eb03a336-49c4-4f6e-b7e3-ab4c6feb77db",
       "name": "calc_valor"
@@ -63,8 +63,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        -80,
-        208
+        -256,
+        368
       ],
       "id": "44610243-8057-459e-947e-47cbdc228e70",
       "name": "http_pagamento"
@@ -80,8 +80,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        112,
-        208
+        -64,
+        368
       ],
       "id": "35c5db47-5493-44ce-a637-6c5906d332a4",
       "name": "resp_pedido"
@@ -121,8 +121,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -368,
-        320
+        -544,
+        480
       ],
       "id": "54a58a70-1b8b-490d-bc72-3e1a743e1d29",
       "name": "sw_valida"
@@ -144,8 +144,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        -864,
-        320
+        -1040,
+        480
       ],
       "id": "15adea81-e1c9-4e6a-a0ae-e4c46dcbdafb",
       "name": "http_catalogo"
@@ -161,8 +161,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -80,
-        384
+        -256,
+        544
       ],
       "id": "665007e8-39dc-4599-903b-f0020161d365",
       "name": "resp_pedido_invalido"
@@ -170,7 +170,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "v1/s01/pedido",
+        "path": "v1/gateway/pedido",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -247,57 +247,6 @@
           },
           "conditions": [
             {
-              "id": "0e6f68a6-2d6e-4c55-ae3c-6a9a45963bab",
-              "leftValue": "={{ $json.headers['x-pedido-id'] }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -1504,
-        688
-      ],
-      "id": "4e457b46-4a97-4e30-904e-281f13749333",
-      "name": "if_x_pedido_id_presente"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\n  \"erro\": \"x_pedido_id_ausente\",\n  \"mensagem\": \"Informe o header x-pedido-id\"\n}",
-        "options": {
-          "responseCode": 400
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        -1280,
-        800
-      ],
-      "id": "9740fc32-b69b-44cf-a93a-21a1d1200211",
-      "name": "resp_x_pedido_id_ausente"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
               "id": "4fd2f9db-c61f-4987-9685-bcb456405cf6",
               "leftValue": "={{ /^Bearer\\s+\\S+$/i.test($json.headers?.authorization ?? '') }}",
               "rightValue": "",
@@ -315,8 +264,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -1296,
-        512
+        -1472,
+        672
       ],
       "id": "ce5fe65a-a774-4516-9c88-f92e56af82b5",
       "name": "if_token_presente"
@@ -327,7 +276,7 @@
         "url": "https://pzaas.online/webhook/cadastro_b/perfil",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "={\n  \"x-api-key\": \"turma2026\",\n  \"x-pedido-id\": \"{{ $json.headers['x-pedido-id'] }}\",\n  \"Content-Type\": \"application/json\"\n}",
+        "jsonHeaders": "={\n  \"x-api-key\": \"turma2026\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"token\": \"{{ $json.headers.authorization.substring(7).trim() }}\"\n}",
@@ -336,8 +285,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        -1088,
-        432
+        -1264,
+        592
       ],
       "id": "9cfb9f80-2645-4f0b-b666-e36bc3eb9d03",
       "name": "req_validar_perfil",
@@ -354,8 +303,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -1088,
-        640
+        -1264,
+        800
       ],
       "id": "6c5cadf7-a8e9-475a-a8db-3c9b6be24c49",
       "name": "res_token_ausente"
@@ -388,8 +337,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -864,
-        560
+        -1040,
+        720
       ],
       "id": "bb5c5eb2-37a5-4c1d-9e97-3f1486f3790a",
       "name": "if_token_invalido"
@@ -405,8 +354,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -624,
-        512
+        -800,
+        672
       ],
       "id": "8c895ac3-6b8d-4693-9be0-47f82a28d653",
       "name": "resp_token_invalido"
@@ -422,8 +371,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -624,
-        688
+        -800,
+        848
       ],
       "id": "2bfb48b0-d66b-4e42-b7c0-ccd4c7790884",
       "name": "resp_auth_indisponivel"
@@ -497,24 +446,6 @@
       "main": [
         [
           {
-            "node": "if_x_pedido_id_presente",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "resp_api_key_invalida",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "if_x_pedido_id_presente": {
-      "main": [
-        [
-          {
             "node": "if_token_presente",
             "type": "main",
             "index": 0
@@ -522,7 +453,7 @@
         ],
         [
           {
-            "node": "resp_x_pedido_id_ausente",
+            "node": "resp_api_key_invalida",
             "type": "main",
             "index": 0
           }
@@ -589,7 +520,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "c28c3157-5ea5-4036-bfd0-d7b9f1ce1cc5",
+  "versionId": "516e7363-bac9-4cf1-947f-7dcf754a8856",
   "meta": {
     "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
   },

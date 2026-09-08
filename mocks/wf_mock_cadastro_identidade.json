@@ -1,0 +1,385 @@
+{
+  "name": "wf_mock_cadastro_identidade",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/mock/cadastro/cadastro",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-960, -360],
+      "id": "5b240027-0a2b-4fb6-9894-e4085ef6347a",
+      "name": "post_mock_cadastro"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-720, -360],
+      "id": "72ba49de-aae9-457e-ba5d-4a42b388ea1c",
+      "name": "if_api_key_cadastro_valida"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"mensagem\": \"Usuario criado com sucesso\",\n  \"token\": \"token_mock_cliente_001\"\n}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-448, -424],
+      "id": "ef41d6a9-09e5-4458-93f7-6e6f267ed4f9",
+      "name": "resp_cadastro_ok"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"API key ausente ou invalida\"\n}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-448, -296],
+      "id": "82c29888-82c6-43d5-8dcb-5d82a4c44d70",
+      "name": "resp_api_key_invalida_cadastro"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/mock/cadastro/login",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-960, 0],
+      "id": "44a5c579-06bf-44e9-986b-2b5db1a4fd23",
+      "name": "post_mock_login"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-720, 0],
+      "id": "d9a0f79a-a8da-4e6e-a1ea-7d9aebef3041",
+      "name": "if_api_key_login_valida"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.body.email === 'cliente.mock@pzaas.test' && $json.body.senha === 'senha-mock' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-512, 0],
+      "id": "fd278685-726e-4f60-b4c8-5fb987417a3a",
+      "name": "if_credenciais_mock_validas"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"token\": \"token_mock_cliente_001\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-272, -64],
+      "id": "362d1042-d5ce-4612-a576-f14fcf8e7408",
+      "name": "resp_login_ok"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Credenciais invalidas\"\n}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-272, 64],
+      "id": "3983db39-d257-4fb2-a4b6-8862731f3ece",
+      "name": "resp_credenciais_invalidas"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"API key ausente ou invalida\"\n}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-512, 128],
+      "id": "41b4b336-dc2e-4bee-8bae-137fb3cc31aa",
+      "name": "resp_api_key_invalida_login"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/mock/cadastro/perfil",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-960, 392],
+      "id": "302994c5-a4a4-4906-b8f7-0e957af5a14a",
+      "name": "post_mock_perfil"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-720, 392],
+      "id": "94b635b2-e3ee-4c84-9d41-742fe7833e7b",
+      "name": "if_api_key_perfil_valida"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.body.token }}",
+              "rightValue": "token_mock_cliente_001",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-512, 392],
+      "id": "06bf0b2d-1ac5-4d4b-b7db-ae5c9a1fc977",
+      "name": "if_token_mock_valido"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"nome\": \"Cliente Mock\",\n  \"perfil\": \"cliente\",\n  \"email\": \"cliente.mock@pzaas.test\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-272, 328],
+      "id": "eb04009d-4e42-4f89-a34a-40bf71e7f9a2",
+      "name": "resp_perfil_ok"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"Token invalido ou nao encontrado\"\n}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-272, 456],
+      "id": "f808adcf-eb18-45cb-a923-04f60111b372",
+      "name": "resp_token_invalido"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"API key ausente ou invalida\"\n}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-512, 520],
+      "id": "c26e61bd-b3b4-4e99-9270-010b28260555",
+      "name": "resp_api_key_invalida_perfil"
+    },
+    {
+      "parameters": {
+        "path": "v1/mock/cadastro/health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-960, 704],
+      "id": "f3ed3baa-77a6-48fc-a2fc-510b3b626563",
+      "name": "get_mock_health"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"tudo certo\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-720, 704],
+      "id": "5ad638c3-abaf-4c3f-a50a-86991db5735b",
+      "name": "resp_health_ok"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "post_mock_cadastro": {
+      "main": [[{"node": "if_api_key_cadastro_valida", "type": "main", "index": 0}]]
+    },
+    "if_api_key_cadastro_valida": {
+      "main": [
+        [{"node": "resp_cadastro_ok", "type": "main", "index": 0}],
+        [{"node": "resp_api_key_invalida_cadastro", "type": "main", "index": 0}]
+      ]
+    },
+    "post_mock_login": {
+      "main": [[{"node": "if_api_key_login_valida", "type": "main", "index": 0}]]
+    },
+    "if_api_key_login_valida": {
+      "main": [
+        [{"node": "if_credenciais_mock_validas", "type": "main", "index": 0}],
+        [{"node": "resp_api_key_invalida_login", "type": "main", "index": 0}]
+      ]
+    },
+    "if_credenciais_mock_validas": {
+      "main": [
+        [{"node": "resp_login_ok", "type": "main", "index": 0}],
+        [{"node": "resp_credenciais_invalidas", "type": "main", "index": 0}]
+      ]
+    },
+    "post_mock_perfil": {
+      "main": [[{"node": "if_api_key_perfil_valida", "type": "main", "index": 0}]]
+    },
+    "if_api_key_perfil_valida": {
+      "main": [
+        [{"node": "if_token_mock_valido", "type": "main", "index": 0}],
+        [{"node": "resp_api_key_invalida_perfil", "type": "main", "index": 0}]
+      ]
+    },
+    "if_token_mock_valido": {
+      "main": [
+        [{"node": "resp_perfil_ok", "type": "main", "index": 0}],
+        [{"node": "resp_token_invalido", "type": "main", "index": 0}]
+      ]
+    },
+    "get_mock_health": {
+      "main": [[{"node": "resp_health_ok", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8f9beec1-90e0-4fdb-a47b-a4f1af748923",
+  "meta": {},
+  "tags": []
+}
