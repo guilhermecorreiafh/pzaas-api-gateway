@@ -3,74 +3,140 @@
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "v1/s01/entrega",
-        "responseMode": "responseNode",
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "73649f39-49be-4145-b391-458e846a2e80",
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
         "options": {}
       },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
       "position": [
-        0,
-        0
+        -512,
+        96
       ],
-      "id": "297e6602-df74-402e-b8ad-7093383a8797",
-      "name": "gt_entrega",
-      "webhookId": "9d2f6486-4bf5-47fb-975f-678eee60cd0a"
+      "id": "95e5e572-e48d-4e4d-b1a3-c3baf896f75c",
+      "name": "if_api_key_valida"
     },
     {
       "parameters": {
-        "jsCode": "const apiKey = $('gt_entrega').first().json.headers['x-api-key'];\nconst body = $('gt_entrega').first().json.body || {};\nconst pedidoId = $('gt_entrega').first().json.headers['x-pedido-id'] || body.pedido_id || null;\n\nif (apiKey !== 'turma2026') {\n  return [{ json: { _erro: true, erro: 'api_key_ausente_ou_invalida' } }];\n}\n\nreturn [{\n  json: {\n    recebido: true,\n    pedido_id: pedidoId,\n    status: 'saiu_para_entrega'\n  }\n}];"
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"API key ausente ou invalida\" }",
+        "options": {
+          "responseCode": 401
+        }
       },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
       "position": [
-        224,
-        0
+        -272,
+        224
       ],
-      "id": "6dd6a8a2-6aee-425a-8a6f-b935a303fae5",
-      "name": "valida_entrega"
+      "id": "47d33359-3a12-40c4-b9c9-c88f85f9b491",
+      "name": "resp_api_key_invalida"
     },
     {
       "parameters": {
-        "rules": {
-          "values": [
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
             {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "12944ed0-3802-407e-af80-d0bde082a4d8",
-                    "leftValue": "={{ $json._erro }}",
-                    "rightValue": true,
-                    "operator": {
-                      "type": "boolean",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
+              "id": "0e6f68a6-2d6e-4c55-ae3c-6a9a45963bab",
+              "leftValue": "={{ $json.headers['x-pedido-id'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
               }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        32
+      ],
+      "id": "235101ce-af31-41d1-b933-880d3706b825",
+      "name": "if_x_pedido_id_presente"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"x_pedido_id_ausente\",\n  \"mensagem\": \"Informe o header x-pedido-id\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -32,
+        128
+      ],
+      "id": "cf51c79f-76a8-4be9-ba37-207172b21072",
+      "name": "resp_x_pedido_id_ausente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "216c6d2a-8dd1-4cd5-99bb-66f77dae85b1",
+              "name": "recebido",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "06369e6d-8dfa-49ff-aab3-27e12ffae772",
+              "name": "pedido_id",
+              "value": "={{ $('post_entrega').first().json.headers['x-pedido-id'] }}",
+              "type": "string"
+            },
+            {
+              "id": "66a6030c-8ee2-4d38-ae31-e666d2ece756",
+              "name": "status",
+              "value": "saiu_para_entrega",
+              "type": "string"
             }
           ]
         },
-        "options": {
-          "fallbackOutput": "extra"
-        }
+        "options": {}
       },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
       "position": [
-        448,
-        0
+        -32,
+        -32
       ],
-      "id": "b2fa815a-7cba-40df-b4bc-da288786aca5",
-      "name": "sw_entrega"
+      "id": "daef5157-0c8a-44d5-87ed-650c0af9b346",
+      "name": "set_resposta_entrega"
     },
     {
       "parameters": {
@@ -83,63 +149,70 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        672,
-        112
+        208,
+        -32
       ],
-      "id": "21286181-72d4-4beb-a6a9-df374fda5ef7",
+      "id": "72067b07-252d-4639-bbd8-69127d90dd55",
       "name": "resp_entrega_ok"
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "{ \"erro\": \"api_key_ausente_ou_invalida\" }",
-        "options": {
-          "responseCode": 401
-        }
+        "httpMethod": "POST",
+        "path": "v1/entrega",
+        "responseMode": "responseNode",
+        "options": {}
       },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
       "position": [
-        672,
-        -96
+        -752,
+        96
       ],
-      "id": "36a1ecd4-e3f7-4711-aa41-d2cef5324d95",
-      "name": "resp_entrega_erro"
+      "id": "a309792b-e53c-400d-97ca-0e3c6c4335b6",
+      "name": "post_entrega",
+      "webhookId": "9d2f6486-4bf5-47fb-975f-678eee60cd0a"
     }
   ],
   "pinData": {},
   "connections": {
-    "gt_entrega": {
+    "if_api_key_valida": {
       "main": [
         [
           {
-            "node": "valida_entrega",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "valida_entrega": {
-      "main": [
-        [
-          {
-            "node": "sw_entrega",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "sw_entrega": {
-      "main": [
-        [
-          {
-            "node": "resp_entrega_erro",
+            "node": "if_x_pedido_id_presente",
             "type": "main",
             "index": 0
           }
         ],
+        [
+          {
+            "node": "resp_api_key_invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_x_pedido_id_presente": {
+      "main": [
+        [
+          {
+            "node": "set_resposta_entrega",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_x_pedido_id_ausente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_resposta_entrega": {
+      "main": [
         [
           {
             "node": "resp_entrega_ok",
@@ -148,18 +221,29 @@
           }
         ]
       ]
+    },
+    "post_entrega": {
+      "main": [
+        [
+          {
+            "node": "if_api_key_valida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "db4b7822-1d9f-4e55-a29f-2a8003edf038",
+  "versionId": "43cc2930-150f-442d-bfea-603d9ebf9965",
   "meta": {
-    "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
+    "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
   },
   "nodeGroups": [],
-  "id": "zTpIkNWKtPBM5717",
+  "id": "dL4EryJcZYefEMDv",
   "tags": []
 }

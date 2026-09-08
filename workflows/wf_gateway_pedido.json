@@ -3,33 +3,15 @@
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "v1/s01/pedido",
-        "responseMode": "responseNode",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        -480,
-        -16
-      ],
-      "id": "d5cece07-7a0d-40d1-aaba-e7681f0d8583",
-      "name": "gt_pedido",
-      "webhookId": "82cc06bc-3e4a-4bb0-a91e-594d2e5d464f",
-      "alwaysOutputData": true
-    },
-    {
-      "parameters": {
-        "jsCode": "const pedido = $('gt_pedido').first().json.body;\n\n// monta a tabela de precos a partir da resposta do Catalogo\nconst catalogo = $('http_catalogo').first().json;\nconst pizzas = catalogo.pizzas || [];\nconst precos = {};\nfor (const p of pizzas) {\n  precos[p.nome] = p.preco;\n}\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    // pizza fora do catalogo -> pedido invalido, sem derrubar o fluxo\n    return [{\n      json: {\n        _erro: true,\n        erro: \"pizza_sem_preco\",\n        motivo: `Pizza sem preço no catálogo: ${item.pizza}`\n      }\n    }];\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    _erro: false,\n    url_pagamento: \"https://dannneves.app.n8n.cloud/webhook/v1/pagamento\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
+        "jsCode": "const pedido = $('post_pedido').first().json.body;\n\n// monta a tabela de precos a partir da resposta do Catalogo\nconst catalogo = $('http_catalogo').first().json;\nconst pizzas = catalogo.pizzas || [];\nconst precos = {};\nfor (const p of pizzas) {\n  precos[p.nome] = p.preco;\n}\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    // pizza fora do catalogo -> pedido invalido, sem derrubar o fluxo\n    return [{\n      json: {\n        _erro: true,\n        erro: \"pizza_sem_preco\",\n        motivo: `Pizza sem preço no catálogo: ${item.pizza}`\n      }\n    }];\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    _erro: false,\n    url_pagamento: \"https://dannneves.app.n8n.cloud/webhook/v1/pagamento\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        304,
-        -16
+        -608,
+        320
       ],
-      "id": "4221bfbb-342f-4522-ad8d-b6011f6fdfc4",
+      "id": "eb03a336-49c4-4f6e-b7e3-ab4c6feb77db",
       "name": "calc_valor"
     },
     {
@@ -81,10 +63,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        800,
-        -144
+        -80,
+        208
       ],
-      "id": "adb8e056-25f3-4f0e-b9ab-50231d3026a5",
+      "id": "44610243-8057-459e-947e-47cbdc228e70",
       "name": "http_pagamento"
     },
     {
@@ -98,10 +80,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        992,
-        -144
+        112,
+        208
       ],
-      "id": "7a7ed2a3-fa29-47b0-92b6-e14a8f64de80",
+      "id": "35c5db47-5493-44ce-a637-6c5906d332a4",
       "name": "resp_pedido"
     },
     {
@@ -139,10 +121,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        512,
-        -16
+        -368,
+        320
       ],
-      "id": "8bc12304-b8ce-48df-9b0e-898a0103c33c",
+      "id": "54a58a70-1b8b-490d-bc72-3e1a743e1d29",
       "name": "sw_valida"
     },
     {
@@ -162,11 +144,46 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        16,
-        -16
+        -864,
+        320
       ],
-      "id": "8c2f0813-3ae0-4d8f-b928-350bb3842792",
+      "id": "15adea81-e1c9-4e6a-a0ae-e4c46dcbdafb",
       "name": "http_catalogo"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"pedido_invalido\", \"motivo\": \"pedido não atende às regras de validação\" }",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -80,
+        384
+      ],
+      "id": "665007e8-39dc-4599-903b-f0020161d365",
+      "name": "resp_pedido_invalido"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/s01/pedido",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1968,
+        800
+      ],
+      "id": "c64b90ce-8fe5-4d74-93e0-6eb6c7f816b1",
+      "name": "post_pedido",
+      "webhookId": "82cc06bc-3e4a-4bb0-a91e-594d2e5d464f",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -179,7 +196,7 @@
           },
           "conditions": [
             {
-              "id": "63e3124f-f946-40e3-9b42-deabc037f64d",
+              "id": "73649f39-49be-4145-b391-458e846a2e80",
               "leftValue": "={{ $json.headers['x-api-key'] }}",
               "rightValue": "turma2026",
               "operator": {
@@ -196,33 +213,16 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -272,
-        -16
+        -1712,
+        800
       ],
-      "id": "8cf3c03e-efcb-4d79-b7df-d089298b7fcf",
-      "name": "if_key"
+      "id": "9b9df050-3ec4-4c96-9c08-97aa80502cd2",
+      "name": "if_api_key_valida"
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{ \"erro\": \"pedido_invalido\", \"motivo\": \"pedido não atende às regras de validação\" }",
-        "options": {
-          "responseCode": 422
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        800,
-        32
-      ],
-      "id": "11833583-8d74-409a-9654-9407552fed07",
-      "name": "resp_pedido_invalido"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "{ \"erro\": \"api_key_ausente_ou_invalida\" }",
+        "responseBody": "{ \"erro\": \"API key ausente ou invalida\" }",
         "options": {
           "responseCode": 401
         }
@@ -230,26 +230,207 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        16,
-        176
+        -1472,
+        928
       ],
-      "id": "00f09569-d3e1-4e8b-a111-8cb72b71735a",
-      "name": "resp_erro_auth"
+      "id": "afb0a2a7-bd2a-4f8a-9e8f-8268833a5b34",
+      "name": "resp_api_key_invalida"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0e6f68a6-2d6e-4c55-ae3c-6a9a45963bab",
+              "leftValue": "={{ $json.headers['x-pedido-id'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1504,
+        688
+      ],
+      "id": "4e457b46-4a97-4e30-904e-281f13749333",
+      "name": "if_x_pedido_id_presente"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"x_pedido_id_ausente\",\n  \"mensagem\": \"Informe o header x-pedido-id\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1280,
+        800
+      ],
+      "id": "9740fc32-b69b-44cf-a93a-21a1d1200211",
+      "name": "resp_x_pedido_id_ausente"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4fd2f9db-c61f-4987-9685-bcb456405cf6",
+              "leftValue": "={{ /^Bearer\\s+\\S+$/i.test($json.headers?.authorization ?? '') }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1296,
+        512
+      ],
+      "id": "ce5fe65a-a774-4516-9c88-f92e56af82b5",
+      "name": "if_token_presente"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pzaas.online/webhook/cadastro_b/perfil",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"x-api-key\": \"turma2026\",\n  \"x-pedido-id\": \"{{ $json.headers['x-pedido-id'] }}\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"token\": \"{{ $json.headers.authorization.substring(7).trim() }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -1088,
+        432
+      ],
+      "id": "9cfb9f80-2645-4f0b-b666-e36bc3eb9d03",
+      "name": "req_validar_perfil",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"token_ausente\",\n  \"mensagem\": \"Informe o header Authorization: Bearer <token>\"\n}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1088,
+        640
+      ],
+      "id": "6c5cadf7-a8e9-475a-a8db-3c9b6be24c49",
+      "name": "res_token_ausente"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "eb539842-0c27-4ea5-9aeb-f979468e0873",
+              "leftValue": "={{ String($json.error?.status ?? $json.error?.statusCode ?? $json.error?.code) === '401' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -864,
+        560
+      ],
+      "id": "bb5c5eb2-37a5-4c1d-9e97-3f1486f3790a",
+      "name": "if_token_invalido"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"token_invalido\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -624,
+        512
+      ],
+      "id": "8c895ac3-6b8d-4693-9be0-47f82a28d653",
+      "name": "resp_token_invalido"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"autenticacao_indisponivel\" }",
+        "options": {
+          "responseCode": 503
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -624,
+        688
+      ],
+      "id": "2bfb48b0-d66b-4e42-b7c0-ccd4c7790884",
+      "name": "resp_auth_indisponivel"
     }
   ],
   "pinData": {},
   "connections": {
-    "gt_pedido": {
-      "main": [
-        [
-          {
-            "node": "if_key",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "calc_valor": {
       "main": [
         [
@@ -301,7 +482,72 @@
         ]
       ]
     },
-    "if_key": {
+    "post_pedido": {
+      "main": [
+        [
+          {
+            "node": "if_api_key_valida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_api_key_valida": {
+      "main": [
+        [
+          {
+            "node": "if_x_pedido_id_presente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_api_key_invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_x_pedido_id_presente": {
+      "main": [
+        [
+          {
+            "node": "if_token_presente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_x_pedido_id_ausente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_token_presente": {
+      "main": [
+        [
+          {
+            "node": "req_validar_perfil",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "res_token_ausente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "req_validar_perfil": {
       "main": [
         [
           {
@@ -312,7 +558,25 @@
         ],
         [
           {
-            "node": "resp_erro_auth",
+            "node": "if_token_invalido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_token_invalido": {
+      "main": [
+        [
+          {
+            "node": "resp_token_invalido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_auth_indisponivel",
             "type": "main",
             "index": 0
           }
@@ -320,16 +584,16 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "203c3a4f-61e3-4689-baba-14c63f15d729",
+  "versionId": "c28c3157-5ea5-4036-bfd0-d7b9f1ce1cc5",
   "meta": {
-    "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
+    "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
   },
   "nodeGroups": [],
-  "id": "rmqMTcOE1u3QVwtA",
+  "id": "o3OHrGshMMie5Vzb",
   "tags": []
 }
