@@ -1,0 +1,266 @@
+{
+  "name": "wf_gateway_pedido",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/s01/pedido",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -16
+      ],
+      "id": "d5cece07-7a0d-40d1-aaba-e7681f0d8583",
+      "name": "gt_pedido",
+      "webhookId": "82cc06bc-3e4a-4bb0-a91e-594d2e5d464f",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const pedido = $('gt_pedido').first().json.body;\nconst apiKey = $('gt_pedido').first().json.headers['x-api-key'];\n\n// valida a api-key\nif (apiKey !== 'turma2026') {\n  return [{ json: { _erro: true, erro: 'api_key_ausente_ou_invalida' } }];\n}\n\n// monta a tabela de precos a partir da resposta do Catalogo\nconst catalogo = $('http_catalogo').first().json;\nconst pizzas = catalogo.pizzas || [];\nconst precos = {};\nfor (const p of pizzas) {\n  precos[p.nome] = p.preco;\n}\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    throw new Error(`Pizza sem preço no catálogo: ${item.pizza}`);\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    url_pagamento: \"http://localhost:5678/webhook/v1/mock/pagamento-a/cobranca\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -16
+      ],
+      "id": "4221bfbb-342f-4522-ad8d-b6011f6fdfc4",
+      "name": "calc_valor"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=  {{ $json.url_pagamento }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $json.api_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "simular_erro",
+              "value": "={{ $json.payload.simular_erro }}"
+            },
+            {
+              "name": "cliente_id",
+              "value": "={{ $json.payload.cliente_id }}"
+            },
+            {
+              "name": "token",
+              "value": "={{ $json.payload.token }}"
+            },
+            {
+              "name": "valor",
+              "value": "={{ $json.payload.valor }}"
+            },
+            {
+              "name": "metodo_pagamento",
+              "value": "={{ $json.payload.metodo_pagamento }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        816,
+        48
+      ],
+      "id": "adb8e056-25f3-4f0e-b9ab-50231d3026a5",
+      "name": "http_pagamento"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": "={{ $json.codigo_erro || 200 }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1008,
+        48
+      ],
+      "id": "7a7ed2a3-fa29-47b0-92b6-e14a8f64de80",
+      "name": "resp_pedido"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json._erro }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "e9302c64-29cc-49e8-a3d8-754d49d369e6"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        -16
+      ],
+      "id": "8bc12304-b8ce-48df-9b0e-898a0103c33c",
+      "name": "sw_valida"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"api_key_ausente_ou_invalida\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1008,
+        -80
+      ],
+      "id": "11833583-8d74-409a-9654-9407552fed07",
+      "name": "resp_erro_auth"
+    },
+    {
+      "parameters": {
+        "url": "https://pzaas.online/webhook/v1/menu",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "turma2026"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -48,
+        -16
+      ],
+      "id": "8c2f0813-3ae0-4d8f-b928-350bb3842792",
+      "name": "http_catalogo"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "gt_pedido": {
+      "main": [
+        [
+          {
+            "node": "http_catalogo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calc_valor": {
+      "main": [
+        [
+          {
+            "node": "sw_valida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_pagamento": {
+      "main": [
+        [
+          {
+            "node": "resp_pedido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sw_valida": {
+      "main": [
+        [
+          {
+            "node": "resp_erro_auth",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "http_pagamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_catalogo": {
+      "main": [
+        [
+          {
+            "node": "calc_valor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "52224ce3-4e90-4209-a6c9-6290dfdf55f4",
+  "meta": {
+    "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
+  },
+  "nodeGroups": [],
+  "id": "rmqMTcOE1u3QVwtA",
+  "tags": []
+}
