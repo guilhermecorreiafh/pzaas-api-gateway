@@ -1,0 +1,472 @@
+{
+  "name": "wf_gateway_cardapio",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "v1/cardapio",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -624,
+        160
+      ],
+      "id": "e5a1b404-2a55-42be-836b-27bc94187289",
+      "name": "gt_cardapio",
+      "webhookId": "72502c99-55db-44ca-9cb3-d0c43e6a2a6d"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "73649f39-49be-4145-b391-458e846a2e80",
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -416,
+        160
+      ],
+      "id": "4a829955-b158-46c3-9bdd-8d9a16d2cbeb",
+      "name": "if_api_key_valida"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"API key ausente ou invalida\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -128,
+        320
+      ],
+      "id": "61fde91e-8838-4406-9c0c-6c84ac3c2198",
+      "name": "resp_api_key_invalida"
+    },
+    {
+      "parameters": {
+        "url": "https://pzaas.online/webhook/v1/menu/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "turma2026"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        128
+      ],
+      "id": "05ab828e-254b-4103-ac1b-e9a2a8218764",
+      "name": "req_catalogo_a",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://pzaas.online/webhook/v1/menu",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "turma2026"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        256
+      ],
+      "id": "cd784ebb-3361-43b6-bef0-6ced2c4685ce",
+      "name": "req_catalogo_b",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        800,
+        0
+      ],
+      "id": "36938315-437a-4e88-9808-a40bd5b0f181",
+      "name": "resp_cardapio_a"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1008,
+        160
+      ],
+      "id": "d666b5ad-15b6-4e8d-af4e-37313f200757",
+      "name": "resp_cardapio_b"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"Catálogo indisponível\" }",
+        "options": {
+          "responseCode": 503
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        864,
+        352
+      ],
+      "id": "d9be2b04-f041-4917-a7f4-7c3130b18be6",
+      "name": "resp_catalogo_indisponivel"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a88a9bfe-9fcf-4f81-be68-a40f450a7514",
+              "leftValue": "={{ $json.cache.cardapio !== null }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        80,
+        16
+      ],
+      "id": "56c628ea-6db5-4692-876b-009235aa5558",
+      "name": "if_cache_hit"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "cache.cardapio",
+        "key": "pzaas:gateway:236161-237057:cardapio:v1",
+        "keyType": "string",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        112
+      ],
+      "id": "6fc3fb90-acce-4680-8836-862310026624",
+      "name": "get_cache_cardapio",
+      "credentials": {
+        "redis": {
+          "id": "upNv03u6LZ0RcVp4",
+          "name": "Redis account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return { json: JSON.parse($json.cache.cardapio) };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -96
+      ],
+      "id": "6389785b-0f8e-4e29-8eeb-dd969b71c12c",
+      "name": "parse_cache_cardapio",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "pzaas:gateway:236161-237057:cardapio:v1",
+        "value": "={{ JSON.stringify($json) }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        624,
+        48
+      ],
+      "id": "b3bd7e66-b4fa-4a86-8a83-b6b7d0a2aa19",
+      "name": "set_cache_cardapio_a",
+      "credentials": {
+        "redis": {
+          "id": "upNv03u6LZ0RcVp4",
+          "name": "Redis account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "pzaas:gateway:236161-237057:cardapio:v1",
+        "value": "={{ JSON.stringify($json) }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        848,
+        160
+      ],
+      "id": "de2b0dd5-e1c3-43f9-88a6-d422a8abfb52",
+      "name": "set_cache_cardapio_b",
+      "credentials": {
+        "redis": {
+          "id": "upNv03u6LZ0RcVp4",
+          "name": "Redis account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        496,
+        -144
+      ],
+      "id": "12be1e8f-246d-4be0-882b-2117a9f29f7b",
+      "name": "resp_cache"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "gt_cardapio": {
+      "main": [
+        [
+          {
+            "node": "if_api_key_valida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_api_key_valida": {
+      "main": [
+        [
+          {
+            "node": "get_cache_cardapio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_api_key_invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "req_catalogo_a": {
+      "main": [
+        [
+          {
+            "node": "set_cache_cardapio_a",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "req_catalogo_b",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "req_catalogo_b": {
+      "main": [
+        [
+          {
+            "node": "set_cache_cardapio_b",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_catalogo_indisponivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_cache_hit": {
+      "main": [
+        [
+          {
+            "node": "parse_cache_cardapio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "req_catalogo_a",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_cache_cardapio": {
+      "main": [
+        [
+          {
+            "node": "if_cache_hit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "req_catalogo_a",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_cache_cardapio_a": {
+      "main": [
+        [
+          {
+            "node": "resp_cardapio_a",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_cache_cardapio_b": {
+      "main": [
+        [
+          {
+            "node": "resp_cardapio_b",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse_cache_cardapio": {
+      "main": [
+        [
+          {
+            "node": "resp_cache",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "req_catalogo_a",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "de3a8447-bef3-4c68-8a15-2b6da6afbcb7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
+  },
+  "nodeGroups": [],
+  "id": "FcCwwGJvC4DO3SS0",
+  "tags": []
+}
