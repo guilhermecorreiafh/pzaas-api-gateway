@@ -85,7 +85,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\n  \"status\": \"APROVADO\",\n  \"transacao_id\": \"trx_mock_0001\",\n  \"pedido_id\": \"ped_mock_0001\",\n  \"cliente\": \"cli_101\",\n  \"valor\": 79.90\n}",
+        "responseBody": "=   {\n     \"status\": \"APROVADO\",\n     \"transacao_id\": \"trx_mock_0001\",\n     \"pedido_id\": \"ped_mock_0001\",\n     \"cliente\": \"{{ $json.body.cliente_id }}\",\n     \"valor\": {{ $json.body.valor }}\n   }",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
@@ -141,12 +141,12 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "e40ddac1-eda2-4cc2-9e18-33f3e11d7e10",
+  "versionId": "8b2a85f6-4325-4857-82ce-15625481af9c",
   "meta": {
     "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
   },
