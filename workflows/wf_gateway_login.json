@@ -1,5 +1,5 @@
 {
-  "name": "wf_gateway_cadastro",
+  "name": "wf_gateway_login",
   "nodes": [
     {
       "parameters": {
@@ -54,79 +54,6 @@
     },
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "v1/gateway/cadastro",
-        "responseMode": "responseNode",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        -144,
-        144
-      ],
-      "id": "386e8ce1-b010-456a-974d-7785ade348df",
-      "name": "post_cadastro",
-      "webhookId": "72502c99-55db-44ca-9cb3-d0c43e6a2a6d"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://pzaas.online/webhook/cadastro_b/cadastro",
-        "sendHeaders": true,
-        "specifyHeaders": "json",
-        "jsonHeaders": "{\n\"x-api-key\": \"turma2026\",\n\"x-pedido-id\": \"={{ $json.headers['x-pedido-id'] }}\",\n\"Content-Type\": \"application/json\"\n} ",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n\"nome\":\t\"{{ $json.body.nome }}\",\n\"email\": \"{{ $json.body.email }}\",\n\"senha\": \"{{ $json.body.senha }}\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.5,
-      "position": [
-        528,
-        0
-      ],
-      "id": "10c61476-7b9e-4d1e-8768-4752633daae9",
-      "name": "req_cadastro",
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ JSON.stringify($json) }}",
-        "options": {
-          "responseCode": 201
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        752,
-        -96
-      ],
-      "id": "03835a95-fd41-4dea-bdcc-749e73c4f3f4",
-      "name": "resp_cadastro_ok"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "{ \"erro\": \"cadastro_indisponivel\" }",
-        "options": {
-          "responseCode": 503
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        752,
-        80
-      ],
-      "id": "fc935607-7621-4606-b292-5fea01753c52",
-      "name": "resp_cadastro_indisponivel"
-    },
-    {
-      "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
@@ -162,7 +89,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\n  \"erro\": \"pedido_id_invalido\",\n  \"mensagem\": \"Informe pedido_id como inteiro positivo\"\n}",
+        "responseBody": "{\n  \"erro\": \"x_pedido_id_ausente\",\n  \"mensagem\": \"Informe o header x-pedido-id\"\n}",
         "options": {
           "responseCode": 400
         }
@@ -175,6 +102,129 @@
       ],
       "id": "2000eb7c-edc1-4505-afbb-12dc0a25d04c",
       "name": "resp_x_pedido_id_ausente"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/gateway/login",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        144
+      ],
+      "id": "386e8ce1-b010-456a-974d-7785ade348df",
+      "name": "post_login",
+      "webhookId": "72502c99-55db-44ca-9cb3-d0c43e6a2a6d"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pzaas.online/webhook/cadastro_b/login",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n\"x-api-key\": \"turma2026\",\n\"x-pedido-id\": \"={{ $json.headers['x-pedido-id'] }}\",\n\"Content-Type\": \"application/json\"\n} ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"email\": \"{{ $json.body.email }}\",\n\"senha\": \"{{ $json.body.senha }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        528,
+        0
+      ],
+      "id": "10c61476-7b9e-4d1e-8768-4752633daae9",
+      "name": "req_login",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        784,
+        -128
+      ],
+      "id": "03835a95-fd41-4dea-bdcc-749e73c4f3f4",
+      "name": "resp_login_ok"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"login_indisponivel\" }",
+        "options": {
+          "responseCode": 503
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        944,
+        176
+      ],
+      "id": "fc935607-7621-4606-b292-5fea01753c52",
+      "name": "resp_login_indisponivel"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"credenciais_invalidas\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        944,
+        -32
+      ],
+      "id": "585bc74e-0005-4ad8-b002-5eea3bfba2e7",
+      "name": "resp_credenciais_invalidas"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1e7f7c24-5f44-44df-8850-54aab03295f7",
+              "leftValue": "={{ String($json.error?.status) }}",
+              "rightValue": "401",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        64
+      ],
+      "id": "59e9f6bb-7d5c-45fd-85be-fc08481d171d",
+      "name": "if_credenciais_invalidas"
     }
   ],
   "pinData": {},
@@ -197,40 +247,11 @@
         ]
       ]
     },
-    "post_cadastro": {
-      "main": [
-        [
-          {
-            "node": "if_api_key_valida",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "req_cadastro": {
-      "main": [
-        [
-          {
-            "node": "resp_cadastro_ok",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "resp_cadastro_indisponivel",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "if_x_pedido_id_presente": {
       "main": [
         [
           {
-            "node": "req_cadastro",
+            "node": "req_login",
             "type": "main",
             "index": 0
           }
@@ -243,6 +264,53 @@
           }
         ]
       ]
+    },
+    "post_login": {
+      "main": [
+        [
+          {
+            "node": "if_api_key_valida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "req_login": {
+      "main": [
+        [
+          {
+            "node": "resp_login_ok",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "if_credenciais_invalidas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_credenciais_invalidas": {
+      "main": [
+        [
+          {
+            "node": "resp_credenciais_invalidas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_login_indisponivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -250,7 +318,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "309d60d4-bd1b-4659-96a2-6fe486e16b93",
+  "versionId": "92a02a7c-ad91-46ea-b21e-1b9b676badc7",
   "meta": {
     "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
   },
