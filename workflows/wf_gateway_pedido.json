@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
+        -336,
         -16
       ],
       "id": "d5cece07-7a0d-40d1-aaba-e7681f0d8583",
@@ -21,7 +21,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const pedido = $('gt_pedido').first().json.body;\nconst apiKey = $('gt_pedido').first().json.headers['x-api-key'];\n\n// valida a api-key\nif (apiKey !== 'turma2026') {\n  return [{\n    json: {\n      _erro: true,\n      erro: 'api_key_ausente_ou_invalida'\n    }\n  }];\n}\n\nconst precos = {\n  \"Calabresa\": 45.90,\n  \"Marguerita\": 42.90,\n  \"Portuguesa\": 48.90\n};\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    throw new Error(`Pizza sem preço na tabela: ${item.pizza}`);\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    url_pagamento: \"http://localhost:5678/webhook/v1/mock/pagamento-a/cobranca\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
+        "jsCode": "const pedido = $('gt_pedido').first().json.body;\nconst apiKey = $('gt_pedido').first().json.headers['x-api-key'];\n\n// valida a api-key\nif (apiKey !== 'turma2026') {\n  return [{ json: { _erro: true, erro: 'api_key_ausente_ou_invalida' } }];\n}\n\n// monta a tabela de precos a partir da resposta do Catalogo\nconst catalogo = $('http_catalogo').first().json;\nconst pizzas = catalogo.pizzas || [];\nconst precos = {};\nfor (const p of pizzas) {\n  precos[p.nome] = p.preco;\n}\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    throw new Error(`Pizza sem preço no catálogo: ${item.pizza}`);\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    url_pagamento: \"http://localhost:5678/webhook/v1/mock/pagamento-a/cobranca\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -161,6 +161,29 @@
       ],
       "id": "11833583-8d74-409a-9654-9407552fed07",
       "name": "resp_erro_auth"
+    },
+    {
+      "parameters": {
+        "url": "https://pzaas.online/webhook/v1/menu",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "turma2026"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -48,
+        -16
+      ],
+      "id": "8c2f0813-3ae0-4d8f-b928-350bb3842792",
+      "name": "http_catalogo"
     }
   ],
   "pinData": {},
@@ -169,7 +192,7 @@
       "main": [
         [
           {
-            "node": "calc_valor",
+            "node": "http_catalogo",
             "type": "main",
             "index": 0
           }
@@ -215,6 +238,17 @@
           }
         ]
       ]
+    },
+    "http_catalogo": {
+      "main": [
+        [
+          {
+            "node": "calc_valor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -222,7 +256,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "972bcc0c-dafe-4a8e-90a3-5b39c4c78962",
+  "versionId": "52224ce3-4e90-4209-a6c9-6290dfdf55f4",
   "meta": {
     "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
   },
