@@ -1,0 +1,165 @@
+{
+  "name": "wf_gateway_entrega",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/s01/entrega",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "297e6602-df74-402e-b8ad-7093383a8797",
+      "name": "gt_entrega",
+      "webhookId": "9d2f6486-4bf5-47fb-975f-678eee60cd0a"
+    },
+    {
+      "parameters": {
+        "jsCode": "const apiKey = $('gt_entrega').first().json.headers['x-api-key'];\nconst body = $('gt_entrega').first().json.body || {};\nconst pedidoId = $('gt_entrega').first().json.headers['x-pedido-id'] || body.pedido_id || null;\n\nif (apiKey !== 'turma2026') {\n  return [{ json: { _erro: true, erro: 'api_key_ausente_ou_invalida' } }];\n}\n\nreturn [{\n  json: {\n    recebido: true,\n    pedido_id: pedidoId,\n    status: 'saiu_para_entrega',\n    aviso: body\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "6dd6a8a2-6aee-425a-8a6f-b935a303fae5",
+      "name": "valida_entrega"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "12944ed0-3802-407e-af80-d0bde082a4d8",
+                    "leftValue": "={{ $json._erro }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "b2fa815a-7cba-40df-b4bc-da288786aca5",
+      "name": "sw_entrega"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        112
+      ],
+      "id": "21286181-72d4-4beb-a6a9-df374fda5ef7",
+      "name": "resp_entrega_ok"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"api_key_ausente_ou_invalida\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "36a1ecd4-e3f7-4711-aa41-d2cef5324d95",
+      "name": "resp_entrega_erro"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "gt_entrega": {
+      "main": [
+        [
+          {
+            "node": "valida_entrega",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valida_entrega": {
+      "main": [
+        [
+          {
+            "node": "sw_entrega",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sw_entrega": {
+      "main": [
+        [
+          {
+            "node": "resp_entrega_erro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_entrega_ok",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "004ccc27-7b35-44ff-8db6-c282e765ae30",
+  "meta": {
+    "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
+  },
+  "nodeGroups": [],
+  "id": "zTpIkNWKtPBM5717",
+  "tags": []
+}
