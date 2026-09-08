@@ -11,28 +11,28 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
-        0
+        -432,
+        80
       ],
-      "id": "5b8138d6-3dea-465c-95d7-bd88e3abe7e2",
+      "id": "30bc81ae-1af4-4725-95e8-879ec6191bc1",
       "name": "gt_mock_pagamento_a",
       "webhookId": "c51e1ef1-f389-4ac1-8eef-8e4c5da0f3ac"
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{ \"erro\": \"servico_indisponivel\" }",
+        "responseBody": "{\n  \"status\": \"RECUSADO\",\n  \"codigo_erro\": 422,\n  \"motivo\": \"saldo_insuficiente\"\n}",
         "options": {
-          "responseCode": 500
+          "responseCode": 422
         }
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        432,
-        -80
+        0,
+        0
       ],
-      "id": "4b76f83f-6b01-4905-8276-cc722e8ca8a9",
+      "id": "5db45829-a4fa-4dc3-8470-9d946d49aff7",
       "name": "resp_erro"
     },
     {
@@ -63,10 +63,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        224,
-        0
+        -208,
+        80
       ],
-      "id": "b3e8644a-2aa0-49c7-9c41-e8655cf46f5f",
+      "id": "5141f7cf-6363-41a3-87db-3c18aa850bf4",
       "name": "if_simular_erro"
     },
     {
@@ -76,25 +76,25 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        624,
-        112
+        192,
+        192
       ],
-      "id": "7b2cd5d7-44c8-4d12-ba5f-279905d7ed6f",
+      "id": "1ab9c1b8-835d-4a10-839c-bc01c5a4cecc",
       "name": "resp_pagamento"
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\n  \"id_pagamento\": \"pag_{{ $now.toMillis() }}\",\n  \"pedido_id\": \"{{ $json.body.pedido_id }}\",\n\"valor\": \"{{ $json.body.valor }}\",  \"status\": \"{{ $json.body.valor <= 500 ? 'aprovado' : 'recusado' }}\"\n}",
+        "responseBody": "{\n  \"status\": \"APROVADO\",\n  \"transacao_id\": \"trx_mock_0001\",\n  \"pedido_id\": \"ped_mock_0001\",\n  \"cliente\": \"cli_101\",\n  \"valor\": 79.90\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        448,
-        112
+        16,
+        192
       ],
-      "id": "0c61ad9c-78cd-46e5-ad75-7567488fa42d",
+      "id": "01347825-2773-4155-9f5f-295dbb686033",
       "name": "set_pagamento"
     }
   ],
@@ -129,11 +129,6 @@
         ]
       ]
     },
-    "resp_pagamento": {
-      "main": [
-        []
-      ]
-    },
     "set_pagamento": {
       "main": [
         [
@@ -151,11 +146,11 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "a22f21d1-d09f-4b3e-8df4-bfa392ce1d5b",
+  "versionId": "e40ddac1-eda2-4cc2-9e18-33f3e11d7e10",
   "meta": {
-    "instanceId": "a21cbc75f6286c26719b8fa059919ae1aefdbd6d0081fe90469a6502551e0563"
+    "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
   },
   "nodeGroups": [],
-  "id": "QUoBXtVBHEPHK3mZ",
+  "id": "MMKT810OTDvzbEnl",
   "tags": []
 }
