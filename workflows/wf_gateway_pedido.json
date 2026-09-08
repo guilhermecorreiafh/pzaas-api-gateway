@@ -4,32 +4,41 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "v1/s01/pedido",
+        "path": "v1/pedido",
         "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
+<<<<<<< Updated upstream
         0,
         -16
+=======
+        -1472,
+        64
+>>>>>>> Stashed changes
       ],
-      "id": "d5cece07-7a0d-40d1-aaba-e7681f0d8583",
+      "id": "5b0a39de-db9f-4a7f-be9a-e339055ee890",
       "name": "gt_pedido",
       "webhookId": "82cc06bc-3e4a-4bb0-a91e-594d2e5d464f",
       "alwaysOutputData": true
     },
     {
       "parameters": {
+<<<<<<< Updated upstream
         "jsCode": "const pedido = $('gt_pedido').first().json.body;\nconst apiKey = $('gt_pedido').first().json.headers['x-api-key'];\n\n// valida a api-key\nif (apiKey !== 'turma2026') {\n  return [{\n    json: {\n      _erro: true,\n      erro: 'api_key_ausente_ou_invalida'\n    }\n  }];\n}\n\nconst precos = {\n  \"Calabresa\": 45.90,\n  \"Marguerita\": 42.90,\n  \"Portuguesa\": 48.90\n};\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    throw new Error(`Pizza sem preço na tabela: ${item.pizza}`);\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    url_pagamento: \"http://localhost:5678/webhook/v1/mock/pagamento-a/cobranca\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
+=======
+        "jsCode": "const pedido = $('gt_pedido').first().json.body;\n\nconst catalogo = $('http_catalogo').first().json;\nconst pizzas = catalogo.pizzas || [];\nconst precos = {};\nfor (const p of pizzas) {\n  precos[p.nome] = p.preco;\n}\n\nlet valor = 0;\nfor (const item of pedido.itens) {\n  const preco = precos[item.pizza];\n  if (preco === undefined) {\n    throw new Error(`Pizza sem preço no catálogo: ${item.pizza}`);\n  }\n  valor += preco * item.quantidade;\n}\n\nreturn [{\n  json: {\n    url_pagamento: \"http://localhost:5678/webhook/v1/mock/pagamento-a/cobranca\",\n    api_key: \"turma2026\",\n    payload: {\n      cliente_id: pedido.cliente_id,\n      token: pedido.token,\n      valor: Number(valor.toFixed(2)),\n      metodo_pagamento: pedido.metodo_pagamento,\n      itens: pedido.itens,\n      simular_erro: pedido.simular_erro\n    }\n  }\n}];"
+>>>>>>> Stashed changes
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        304,
-        -16
+        -832,
+        64
       ],
-      "id": "4221bfbb-342f-4522-ad8d-b6011f6fdfc4",
+      "id": "463ccbe7-7f1d-4df7-8913-eb1119554a14",
       "name": "calc_valor"
     },
     {
@@ -81,10 +90,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        816,
-        48
+        -384,
+        -48
       ],
-      "id": "adb8e056-25f3-4f0e-b9ab-50231d3026a5",
+      "id": "7e6ee9c7-1151-4ca8-bd69-86bad81ca2d9",
       "name": "http_pagamento"
     },
     {
@@ -98,10 +107,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1008,
-        48
+        -192,
+        -48
       ],
-      "id": "7a7ed2a3-fa29-47b0-92b6-e14a8f64de80",
+      "id": "b84c8d7a-d557-488c-932b-3b6b7c02c5a4",
       "name": "resp_pedido"
     },
     {
@@ -119,7 +128,7 @@
                 "conditions": [
                   {
                     "leftValue": "={{ $json._erro }}",
-                    "rightValue": true,
+                    "rightValue": false,
                     "operator": {
                       "type": "boolean",
                       "operation": "equals"
@@ -139,14 +148,91 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        512,
-        -16
+        -640,
+        64
       ],
-      "id": "8bc12304-b8ce-48df-9b0e-898a0103c33c",
+      "id": "f1ef1ec1-98bb-451b-be61-bf57f92067d6",
       "name": "sw_valida"
     },
     {
       "parameters": {
+<<<<<<< Updated upstream
+=======
+        "url": "https://pzaas.online/webhook/v1/menu",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "turma2026"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -992,
+        64
+      ],
+      "id": "f869fc1a-5dc3-4657-a7dc-b9e9fb32cb62",
+      "name": "http_catalogo"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d7d58639-3a1c-4b20-8903-1fb6b18aa6c5",
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1248,
+        64
+      ],
+      "id": "a02366af-134e-4bc6-83d6-eafcb4903350",
+      "name": "if_key"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"pedido_invalido\", \"motivo\": \"pedido não atende às regras de validação\" }",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -192,
+        128
+      ],
+      "id": "dbc7aa26-bc28-4294-8128-fd597cd69784",
+      "name": "resp_pedido_invalido"
+    },
+    {
+      "parameters": {
+>>>>>>> Stashed changes
         "respondWith": "json",
         "responseBody": "{ \"erro\": \"api_key_ausente_ou_invalida\" }",
         "options": {
@@ -156,10 +242,17 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
+<<<<<<< Updated upstream
         1008,
         -80
       ],
       "id": "11833583-8d74-409a-9654-9407552fed07",
+=======
+        -992,
+        240
+      ],
+      "id": "70203422-423d-4ce9-bb6d-8f5d0ad4f573",
+>>>>>>> Stashed changes
       "name": "resp_erro_auth"
     }
   ],
@@ -169,7 +262,11 @@
       "main": [
         [
           {
+<<<<<<< Updated upstream
             "node": "calc_valor",
+=======
+            "node": "if_key",
+>>>>>>> Stashed changes
             "type": "main",
             "index": 0
           }
@@ -202,31 +299,67 @@
       "main": [
         [
           {
-            "node": "resp_erro_auth",
+            "node": "http_pagamento",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "http_pagamento",
+            "node": "resp_pedido_invalido",
             "type": "main",
             "index": 0
           }
         ]
       ]
+<<<<<<< Updated upstream
+=======
+    },
+    "http_catalogo": {
+      "main": [
+        [
+          {
+            "node": "calc_valor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_key": {
+      "main": [
+        [
+          {
+            "node": "http_catalogo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_erro_auth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+>>>>>>> Stashed changes
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
+<<<<<<< Updated upstream
   "versionId": "972bcc0c-dafe-4a8e-90a3-5b39c4c78962",
+=======
+  "versionId": "e4dc2b2e-c0ea-45a8-bb28-c2a2920fd2c5",
+>>>>>>> Stashed changes
   "meta": {
-    "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
+    "instanceId": "8a5832cfccebf1f6e4152d67714b8a9e39672100660b3961e0850a37e9a65b24"
   },
   "nodeGroups": [],
-  "id": "rmqMTcOE1u3QVwtA",
+  "id": "jpOfXEMC5AWaDBdx",
   "tags": []
 }
