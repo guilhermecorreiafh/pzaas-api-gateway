@@ -1,0 +1,518 @@
+{
+  "name": "wf_gateway_status",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "73649f39-49be-4145-b391-458e846a2e80",
+              "leftValue": "={{ $json.headers['x-api-key'] }}",
+              "rightValue": "turma2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -400,
+        32
+      ],
+      "id": "bbdeb852-4051-4150-b9b9-c9de87e7dfaa",
+      "name": "if_api_key_valida"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"erro\": \"API key ausente ou invalida\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -128,
+        192
+      ],
+      "id": "5a842129-45d6-41c2-966d-fc96a560fba9",
+      "name": "resp_api_key_invalida"
+    },
+    {
+      "parameters": {
+        "path": "v1/status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        32
+      ],
+      "id": "a15d426f-5229-4bcd-b65c-71df7d1c2454",
+      "name": "gt_status",
+      "webhookId": "72502c99-55db-44ca-9cb3-d0c43e6a2a6d"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0e6f68a6-2d6e-4c55-ae3c-6a9a45963bab",
+              "leftValue": "={{ Number.isInteger(Number($json.query.pedido_id)) && Number($json.query.pedido_id) > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -176,
+        -64
+      ],
+      "id": "216c8692-b7f2-43cb-b1bf-59204c910545",
+      "name": "if_pedido_id_valido"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"erro\": \"pedido_id_invalido\",\n  \"mensagem\": \"Informe pedido_id como inteiro positivo\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        48,
+        32
+      ],
+      "id": "4bfdb236-82f4-4cdd-aeca-e2223ba556e4",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "url": "https://pzaas.online/webhook/v1/pedido/status",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pedido_id",
+              "value": "={{ $json.query.pedido_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "turma2026"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        48,
+        -160
+      ],
+      "id": "c8af0a09-24c9-4e72-9139-369c5f3e2be3",
+      "name": "req_orquestrador_a",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        304,
+        -256
+      ],
+      "id": "61bd15ca-3398-48b5-b1e6-78681b330654",
+      "name": "resp_orquestrador_a_ok"
+    },
+    {
+      "parameters": {
+        "url": "https://pzaas.online/webhook/v1/pedido",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "turma2026"
+            },
+            {
+              "name": "x-pedido-id",
+              "value": "={{ $json.query.pedido_id }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        608,
+        -64
+      ],
+      "id": "873748c5-e66d-4d4f-9668-c20dc3af1c5a",
+      "name": "req_orquestrador_b",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        816,
+        -80
+      ],
+      "id": "e2dca81e-f0bd-4f55-86f0-e80797363c1b",
+      "name": "resp_orquestrador_b_ok"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ String($json.error?.code ?? $json.error?.statusCode) }}",
+                    "rightValue": "404",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d89a9761-abbf-4392-817b-865da1daf967"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "pedido_nao_encontrado_a"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ef4f618e-a0c4-4c20-8976-e81a44abf15e",
+                    "leftValue": "={{ !Number($json.error?.code ?? $json.error?.statusCode) || Number($json.error?.code ?? $json.error?.statusCode) >= 500 }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "tentar_orquestrador_b"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        -80
+      ],
+      "id": "d4f33c41-f72b-460e-8658-4ae13816655d",
+      "name": "sw_erro_orquestrador_a"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  erro: 'pedido_nao_encontrado',\n  pedido_id: Number($('gt_status').first().json.query.pedido_id)\n}) }}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        592,
+        -272
+      ],
+      "id": "589d6568-d70f-4107-bf84-d9793c7418df",
+      "name": "resp_pedido_nao_encontrado_a"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  erro: 'pedido_nao_encontrado',\n  pedido_id: Number($('gt_status').first().json.query.pedido_id)\n}) }}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1088,
+        64
+      ],
+      "id": "64d9dde1-17ea-41ff-a47b-c6b62365bdbc",
+      "name": "resp_pedido_nao_encontrado_b"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0e026540-e134-48af-abb7-062c4b15b77c",
+              "leftValue": "={{ String($json.error?.code ?? $json.error?.statusCode) }}",
+              "rightValue": "404",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        80
+      ],
+      "id": "db4bd081-b4b0-4352-85c5-b324851a4cdb",
+      "name": "if_nao_encontrado_b"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  erro: 'orquestrador_indisponivel',\n  pedido_id: Number($('gt_status').first().json.query.pedido_id)\n}) }}",
+        "options": {
+          "responseCode": 503
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1056,
+        256
+      ],
+      "id": "18025855-f266-4881-8e92-50da5a4a90a1",
+      "name": "resp_orquestrador_indisponivel"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "if_api_key_valida": {
+      "main": [
+        [
+          {
+            "node": "if_pedido_id_valido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_api_key_invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gt_status": {
+      "main": [
+        [
+          {
+            "node": "if_api_key_valida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_pedido_id_valido": {
+      "main": [
+        [
+          {
+            "node": "req_orquestrador_a",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "req_orquestrador_a": {
+      "main": [
+        [
+          {
+            "node": "resp_orquestrador_a_ok",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "sw_erro_orquestrador_a",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "req_orquestrador_b": {
+      "main": [
+        [
+          {
+            "node": "resp_orquestrador_b_ok",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "if_nao_encontrado_b",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sw_erro_orquestrador_a": {
+      "main": [
+        [
+          {
+            "node": "resp_pedido_nao_encontrado_a",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "req_orquestrador_b",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_orquestrador_indisponivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_nao_encontrado_b": {
+      "main": [
+        [
+          {
+            "node": "resp_pedido_nao_encontrado_b",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resp_orquestrador_indisponivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "08120048-4bff-46f3-ba8d-0cc3d6307d1e",
+  "meta": {
+    "instanceId": "9e93a614a0d22e89dd2c1813ded1767a0a2aa9ab25e78e7788d6ee50100662e9"
+  },
+  "nodeGroups": [],
+  "id": "NFL5diZHuWVmC0Sd",
+  "tags": []
+}
