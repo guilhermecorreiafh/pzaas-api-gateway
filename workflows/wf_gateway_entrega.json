@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const apiKey = $('gt_entrega').first().json.headers['x-api-key'];\nconst body = $('gt_entrega').first().json.body || {};\nconst pedidoId = $('gt_entrega').first().json.headers['x-pedido-id'] || body.pedido_id || null;\n\nif (apiKey !== 'turma2026') {\n  return [{ json: { _erro: true, erro: 'api_key_ausente_ou_invalida' } }];\n}\n\nreturn [{\n  json: {\n    recebido: true,\n    pedido_id: pedidoId,\n    status: 'saiu_para_entrega',\n    aviso: body\n  }\n}];"
+        "jsCode": "const apiKey = $('gt_entrega').first().json.headers['x-api-key'];\nconst body = $('gt_entrega').first().json.body || {};\nconst pedidoId = $('gt_entrega').first().json.headers['x-pedido-id'] || body.pedido_id || null;\n\nif (apiKey !== 'turma2026') {\n  return [{ json: { _erro: true, erro: 'api_key_ausente_ou_invalida' } }];\n}\n\nreturn [{\n  json: {\n    recebido: true,\n    pedido_id: pedidoId,\n    status: 'saiu_para_entrega'\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -155,7 +155,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "004ccc27-7b35-44ff-8db6-c282e765ae30",
+  "versionId": "db4b7822-1d9f-4e55-a29f-2a8003edf038",
   "meta": {
     "instanceId": "634f528354960e7799b0d8e1048c1159083409352fcf4c53004252f8b1ec0bcc"
   },
